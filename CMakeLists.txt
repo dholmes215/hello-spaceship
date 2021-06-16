@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20.3)
 
-project(hello LANGUAGES CXX)
+project(spaceship LANGUAGES CXX)
 
 # Link this 'library' to use the warnings specified in CompilerWarnings.cmake
 add_library(project_warnings INTERFACE)
