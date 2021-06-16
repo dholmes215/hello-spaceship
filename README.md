@@ -1,4 +1,4 @@
-# cpp-template
+# C++20 Spaceship Operator Demo
 
 ![Build](https://github.com/dholmes215/hello-spaceship/actions/workflows/build.yml/badge.svg) ![clang-format](https://github.com/dholmes215/hello-spaceship/actions/workflows/clang-format.yml/badge.svg)
 
