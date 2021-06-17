@@ -19,18 +19,22 @@ enum class ship_class {
 
 struct ship {
     using year = int;
+    using ship_name = std::string;
+    using ship_registry = std::string;
 
-    std::string name;
-    std::string registry;
+    ship_name name;
+    ship_registry registry;
     ship_class model{};
     year first_seen{};
 
-    bool operator<(const ship& other) const noexcept
-    {
-        return std::tie(name, registry, model, first_seen) <
-               std::tie(other.name, other.registry, other.model,
-                        other.first_seen);
-    }
+    auto operator<=>(const ship& other) const noexcept = default;
+
+    // bool operator<(const ship& other) const noexcept
+    // {
+    //     return std::tie(name, registry, model, first_seen) <
+    //            std::tie(other.name, other.registry, other.model,
+    //                     other.first_seen);
+    // }
 };
 
 std::ostream& operator<<(std::ostream& out, const ship& obj)
