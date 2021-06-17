@@ -1,5 +1,6 @@
 // Copyright (C) 2021 David Holmes <dholmes@dholmes.us>. All rights reserved.
 #include <algorithm>
+#include <compare>
 #include <iostream>
 #include <set>
 #include <string>
