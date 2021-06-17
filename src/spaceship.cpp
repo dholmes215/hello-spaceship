@@ -20,14 +20,10 @@ enum class ship_class {
 };
 
 struct ship {
-    using year = int;
-    using ship_name = std::string;
-    using ship_registry = std::string;
-
-    ship_name name;
-    ship_registry registry;
+    std::string name;
+    std::string registry;
     ship_class model{};
-    year first_seen{};
+    int first_seen{};
 
     auto operator<=>(const ship& other) const noexcept = default;
 
