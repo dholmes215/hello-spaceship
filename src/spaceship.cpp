@@ -6,6 +6,11 @@
 #include <string>
 #include <tuple>
 
+static_assert(__cpp_impl_three_way_comparison,
+              "Three-way comparison compiler support is missing");
+static_assert(__cpp_lib_three_way_comparison,
+              "Three-way comparison library support is missing");
+
 namespace {
 
 enum class ship_class {
