@@ -82,7 +82,7 @@ void print_ships(std::ostream& out, const std::set<ship>& ships)
     out << '\n';
 }
 
-__attribute__((unused)) const char* to_string(std::strong_ordering o) noexcept
+[[maybe_unused]] const char* to_string(std::strong_ordering o) noexcept
 {
     if (o == std::strong_ordering::less) {
         return "std::strong_ordering::less";
@@ -98,7 +98,7 @@ __attribute__((unused)) const char* to_string(std::strong_ordering o) noexcept
     }
 }
 
-__attribute__((unused)) const char* to_string(std::weak_ordering o) noexcept
+[[maybe_unused]] const char* to_string(std::weak_ordering o) noexcept
 {
     if (o == std::weak_ordering::less) {
         return "std::weak_ordering::less";
@@ -111,7 +111,7 @@ __attribute__((unused)) const char* to_string(std::weak_ordering o) noexcept
     }
 }
 
-__attribute__((unused)) const char* to_string(std::partial_ordering o) noexcept
+[[maybe_unused]] const char* to_string(std::partial_ordering o) noexcept
 {
     if (o == std::partial_ordering::less) {
         return "std::partial_ordering::less";
