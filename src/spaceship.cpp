@@ -1,15 +1,19 @@
 // Copyright (C) 2021 David Holmes <dholmes@dholmes.us>. All rights reserved.
 #include <algorithm>
+#include <array>
+#include <cmath>
 #include <compare>
 #include <iostream>
+#include <map>
 #include <set>
 #include <string>
 #include <tuple>
 
-static_assert(__cpp_impl_three_way_comparison,
-              "Three-way comparison compiler support is missing");
-static_assert(__cpp_lib_three_way_comparison,
-              "Three-way comparison library support is missing");
+#ifdef __cpp_impl_three_way_comparison
+#ifdef __cpp_lib_three_way_comparison
+#define COMPARE_3WAY
+#endif  // __cpp_lib_three_way_comparison
+#endif  // __cpp_impl_three_way_comparison
 
 namespace {
 
@@ -30,14 +34,37 @@ struct ship {
     ship_class model{};
     int first_seen{};
 
-    auto operator<=>(const ship& other) const noexcept = default;
+#ifdef COMPARE_3WAY
+    friend auto operator<=>(const ship& l, const ship& r) noexcept = default;
+    // friend std::strong_ordering operator<=>(const ship& l,
+    //                                         const ship& r) noexcept =
+    //                                         default;
+#else
+    friend bool operator<(const ship& l, const ship& r) noexcept
+    {
+        return std::tie(l.name, l.registry, l.model, l.first_seen) <
+               std::tie(r.name, r.registry, r.model, r.first_seen);
+    }
+    friend bool operator>(const ship& l, const ship& r) noexcept
+    {
+        return l > r;
+    }
+    friend bool operator<=(const ship& l, const ship& r) noexcept
+    {
+        return !(l > r);
+    }
+    friend bool operator>=(const ship& l, const ship& r) noexcept
+    {
+        return !(l < r);
+    }
 
-    // bool operator<(const ship& other) const noexcept
-    // {
-    //     return std::tie(name, registry, model, first_seen) <
-    //            std::tie(other.name, other.registry, other.model,
-    //                     other.first_seen);
-    // }
+    // defaulted == and != is also a C++20 feature, but they're implied by
+    // defaulted operator<=>.
+    friend bool operator==(const ship& l, const ship& r) noexcept = default;
+
+    // In C++20 != is now automatically defaulted if == is defined.
+    // friend bool operator!=(const ship& l, const ship& r) noexcept = default;
+#endif  // COMPARE_3WAY
 };
 
 std::ostream& operator<<(std::ostream& out, const ship& obj)
@@ -53,6 +80,51 @@ void print_ships(std::ostream& out, const std::set<ship>& ships)
         out << ship << '\n';
     }
     out << '\n';
+}
+
+__attribute__((unused)) const char* to_string(std::strong_ordering o) noexcept
+{
+    if (o == std::strong_ordering::less) {
+        return "std::strong_ordering::less";
+    }
+    else if (o == std::strong_ordering::equivalent) {
+        return "std::strong_ordering::equivalent";
+    }
+    else if (o == std::strong_ordering::equal) {
+        return "std::strong_ordering::equal";
+    }
+    else {
+        return "std::strong_ordering::greater";
+    }
+}
+
+__attribute__((unused)) const char* to_string(std::weak_ordering o) noexcept
+{
+    if (o == std::weak_ordering::less) {
+        return "std::weak_ordering::less";
+    }
+    else if (o == std::weak_ordering::equivalent) {
+        return "std::weak_ordering::equivalent";
+    }
+    else {
+        return "std::weak_ordering::greater";
+    }
+}
+
+__attribute__((unused)) const char* to_string(std::partial_ordering o) noexcept
+{
+    if (o == std::partial_ordering::less) {
+        return "std::partial_ordering::less";
+    }
+    else if (o == std::partial_ordering::equivalent) {
+        return "std::partial_ordering::equivalent";
+    }
+    else if (o == std::partial_ordering::greater) {
+        return "std::partial_ordering::greater";
+    }
+    else {
+        return "std::partial_ordering::unordered";
+    }
 }
 
 }  // namespace
@@ -110,4 +182,27 @@ int main()
 
     std::cout << "Updated list with replacements:\n";
     print_ships(std::cout, ships);
+
+    ship defiant{"Defiant", "NX-74205-A", ship_class::defiant, 2375};
+    ship enterprise{"Enterprise", "NCC-1701-D", ship_class::galaxy, 2363};
+    std::cout << defiant << " <=> " << enterprise << ": "
+              << to_string(defiant <=> enterprise) << '\n';
+
+    std::cout << "1.0f <=> 2.0f: " << to_string(1.0f <=> 2.0f) << '\n';
+    std::cout << "1.0f <=> 1.0f: " << to_string(1.0f <=> 1.0f) << '\n';
+    std::cout << "1.0f/0.0f <=> 1.0f: " << to_string(1.0f / 0.0f <=> 1.0f)
+              << '\n';
+    std::cout << "std::nanf(\"1\") <=> std::nanf(\"2\"): "
+              << to_string(std::nanf("1") <=> std::nanf("2")) << '\n';
+    std::cout << "std::weak_order(std::nanf(\"1\"), std::nanf(\"2\")): "
+              << to_string(std::weak_order(std::nanf("1"), std::nanf("2")))
+              << '\n';
+
+    std::array<float, 6> floats = {
+        2.0, std::nanf("1"), 1.0f / 0.0f, std::nanf("2"), std::nanf("1"), 1.0};
+    std::sort(floats.begin(), floats.end());
+    for (float f : floats) {
+        std::cout << f << ',';
+    }
+    std::cout << '\n';
 }
