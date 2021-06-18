@@ -4,6 +4,7 @@
 #include <cmath>
 #include <compare>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <set>
 #include <string>
@@ -198,8 +199,12 @@ int main()
               << to_string(std::weak_order(std::nanf("1"), std::nanf("2")))
               << '\n';
 
-    std::array<float, 6> floats = {
-        2.0, std::nanf("1"), 1.0f / 0.0f, std::nanf("2"), std::nanf("1"), 1.0};
+    std::array<float, 6> floats = {2.0,
+                                   std::nanf("1"),
+                                   std::numeric_limits<float>::infinity(),
+                                   std::nanf("2"),
+                                   std::nanf("1"),
+                                   1.0};
     std::sort(floats.begin(), floats.end());
     for (float f : floats) {
         std::cout << f << ',';
